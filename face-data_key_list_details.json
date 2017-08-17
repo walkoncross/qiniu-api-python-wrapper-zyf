@@ -1,0 +1,18 @@
+[
+    {
+        "mimeType": "application/zip", 
+        "hash": "FjYkhk9l-lxUcoE_d1cJU3IK90tS", 
+        "fsize": 52841, 
+        "key": "Submission_example.zip", 
+        "type": 0, 
+        "putTime": 14696020583311069
+    }, 
+    {
+        "mimeType": "application/zip", 
+        "hash": "Fs8bIYz7wZGWGkAOG6U0KzxgzS0o", 
+        "fsize": 8140, 
+        "key": "ovpn-ssh-zyf.zip", 
+        "type": 0, 
+        "putTime": 14783952136189144
+    }
+]
