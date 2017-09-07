@@ -26,11 +26,11 @@ contains_str = None
 #初始化Auth状态
 q = Auth(access_key, secret_key)
 #初始化BucketManager
-bucket = BucketManager(q)
+bktMgr = BucketManager(q)
 #你要测试的空间， 并且这个key在你空间中存在
 
 #获取文件的状态信息
-ret = bucket.list(bucket_name, prefix)
+ret = bktMgr.list(bucket_name, prefix)
 
 items = ret[0]['items']
 
@@ -41,7 +41,7 @@ else:
 print key_list
 
 for key in key_list:
-    ret2 = bucket.move(bucket_name, key, bucket_name2, key)
+    ret2 = bktMgr.move(bucket_name, key, bucket_name2, key)
     print '\n==========bucket.move() returns:'
     if ret2:
         print ret2

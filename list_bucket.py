@@ -30,11 +30,11 @@ fp2 = open(rlt_list_file2, 'w')
 #初始化Auth状态
 q = Auth(access_key, secret_key)
 #初始化BucketManager
-bucket = BucketManager(q)
+bktMgr = BucketManager(q)
 #你要测试的空间， 并且这个key在你空间中存在
 
 #获取文件的状态信息
-ret = bucket.list(bucket_name, prefix)
+ret = bktMgr.list(bucket_name, prefix)
 
 items = ret[0]['items']
 
