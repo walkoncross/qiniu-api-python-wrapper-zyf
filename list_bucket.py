@@ -25,7 +25,7 @@ max_list_cnt = None
 
 contains_str = 'zip'
 
-rlt_list_file = bucket_name + '_key_list.json'
+rlt_list_file = bucket_name + '_key_list.txt'
 fp = open(rlt_list_file, 'w')
 
 if save_details:

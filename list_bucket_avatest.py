@@ -26,7 +26,7 @@ prefix = 'assets/face_card_data'
 max_list_cnt = 2000 # set to None for no limit
 contains_str = 'jpg'
 
-rlt_list_file = bucket_name + '_key_list.json'
+rlt_list_file = bucket_name + '_key_list.txt'
 fp = open(rlt_list_file, 'w')
 
 if save_details:
