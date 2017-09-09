@@ -23,7 +23,7 @@ if not osp.exists(download_save_path):
     os.makedirs(download_save_path)
 
 OVERWRITE_LOCAL_FILE = False
-
+download_expire_time = 3600
 
 bucket_name = 'facex-train-sphereface-bs256-0807'
 bucket_domain = 'http://oubom5rzl.bkt.clouddn.com'
@@ -64,6 +64,9 @@ for key in key_list:
     if '28' not in key:
         continue
 
+    if '/' in key: ## makedirs for key in the form "xxx/yyy/zzz"
+        osp.makedirs(osp.join(download_save_path, osp.split(key)[0]))
+
     save_fn = osp.join(download_save_path, key)
     if not OVERWRITE_LOCAL_FILE and osp.exists(save_fn):
         print '---> File already exists, will not download this one'
@@ -72,7 +75,7 @@ for key in key_list:
     base_url = 'http://%s/%s' % (bucket_domain, key)
     print '---> download url: ' + base_url
     #可以设置token过期时间
-    private_url = q.private_download_url(base_url)
+    private_url = q.private_download_url(base_url, download_expire_time)
     print '---> private_url: ' + private_url
     r = requests.get(private_url)
 
