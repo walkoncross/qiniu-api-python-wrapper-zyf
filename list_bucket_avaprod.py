@@ -16,16 +16,15 @@ from ak_sk import get_ak_sk
 
 
 #access_key, secret_key = get_ak_sk()
-access_key, secret_key = get_ak_sk('ak_sk_avatest.json')
+access_key, secret_key = get_ak_sk('ak_sk_avaprod.json')
 
 save_details = False
 
-bucket_name = 'identities-dataset'
+bucket_name = 'ava-test'
 #prefix = 'lfw'
-#prefix = None
-prefix = 'assets/face_card_data'
+prefix = None
 max_list_cnt = None  # set to None for no limit
-#contains_str = None
+contains_str = None
 contains_str = ['.zip', '.tgz', '.tar.gz', '.txt']
 
 rlt_list_file = bucket_name + '_key_list.txt'

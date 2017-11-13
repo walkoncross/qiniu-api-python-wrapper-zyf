@@ -18,20 +18,24 @@ from ak_sk import get_ak_sk
 
 access_key, secret_key = get_ak_sk()
 
-download_save_path = r'./'
+download_save_path = r'F:\FaceDataset-new\face-asian'
 if not osp.exists(download_save_path):
     os.makedirs(download_save_path)
 
 OVERWRITE_LOCAL_FILE = False
 download_expire_time = 3600
 
-bucket_name = 'facex-train-sphereface-bs256-0807'
-bucket_domain = 'http://oubom5rzl.bkt.clouddn.com'
+#bucket_name = 'facex-train-sphereface-bs256-0807'
+#bucket_domain = 'http://oubom5rzl.bkt.clouddn.com'
 #prefix = 'lfw'
-prefix = None
+#prefix = None
 
-#contains_str = None
-contains_str = '.caffemodel'
+bucket_name = 'face-asian'
+bucket_domain = 'http://outj1l7fd.bkt.clouddn.com'
+prefix = 'face_asian'
+
+contains_str = None
+#contains_str = 'txt'
 
 
 #初始化Auth状态
@@ -61,9 +65,9 @@ print '===> Start downloading <==='
 
 for key in key_list:
     #有两种方式构造base_url的形式
-    if '28' not in key:
-        continue
-
+#    if '28' not in key:
+#        continue
+#
     if '/' in key: ## makedirs for key in the form "xxx/yyy/zzz"
         osp.makedirs(osp.join(download_save_path, osp.split(key)[0]))
 
@@ -72,7 +76,11 @@ for key in key_list:
         print '---> File already exists, will not download this one'
         continue
 
-    base_url = 'http://%s/%s' % (bucket_domain, key)
+    if not bucket_domain.startswith('http'):
+        base_url = 'http://%s/%s' % (bucket_domain, key)
+    else:
+        base_url = '%s/%s' % (bucket_domain, key)
+
     print '---> download url: ' + base_url
     #可以设置token过期时间
     private_url = q.private_download_url(base_url, download_expire_time)
@@ -83,7 +91,10 @@ for key in key_list:
         print 'requests.get(private_url) ---> Succeeded'
 
         fp = open(save_fn, 'wb')
-        fp.write(r)
+        fp.write(r.content)
         fp.close()
     else:
         print 'requests.get(private_url) ---> Failed'
+
+    r.close()
+

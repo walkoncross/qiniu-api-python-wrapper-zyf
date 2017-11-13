@@ -17,14 +17,15 @@ from ak_sk import get_ak_sk
 
 access_key, secret_key = get_ak_sk()
 
-save_details = True
+save_details = False
 
-bucket_name = 'face-data'
+bucket_name = 'face-fddb'
 #prefix = 'lfw'
 prefix = None
 max_list_cnt = None
 
-contains_str = 'zip'
+#contains_str = None
+contains_str = ['.zip', '.tgz', '.tar.gz', '.txt']
 
 rlt_list_file = bucket_name + '_key_list.txt'
 fp = codecs.open(rlt_list_file, 'w', encoding='utf-8')
@@ -52,11 +53,19 @@ while True:
     items = ret[0]['items']
 
     if contains_str:
-        key_list = [it['key']
-                    for it in items if contains_str in it['key'].lower()]
-        if save_details:
-            key_list2 = [
-                it for it in items if contains_str in it['key'].lower()]
+#        key_list = [it['key']
+#                    for it in items if contains_str in it['key'].lower()]
+#        if save_details:
+#            key_list2 = [
+#                it for it in items if contains_str in it['key'].lower()]
+        key_list = []
+        key_list2 = []
+        for i in range(len(items)):
+            for sub_str in contains_str:
+                if sub_str in items[i]['key'].lower():
+                    key_list.append(items[i]['key'])
+                    if save_details:
+                        key_list2.append(items[i])
     else:
         key_list = [it['key'] for it in items]
         if save_details:
@@ -65,6 +74,11 @@ while True:
     # print key_list
     fetch_cnt = len(key_list)
     print "%d qualified files found" % fetch_cnt
+
+    first_n = min(fetch_cnt, 10)
+    print "---> First %d files:" % first_n
+    for i in range(first_n):
+        print '%d --> %s' % (i+1, key_list[i])
 
     #json.dump(key_list, fp, indent=2)
 
