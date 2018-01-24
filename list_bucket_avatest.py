@@ -18,6 +18,8 @@ from ak_sk import get_ak_sk
 #access_key, secret_key = get_ak_sk()
 access_key, secret_key = get_ak_sk('ak_sk_avatest.json')
 
+##################################################
+# configs
 save_details = False
 
 bucket_name = 'identities-dataset'
@@ -27,6 +29,9 @@ prefix = 'assets/face_card_data'
 max_list_cnt = None  # set to None for no limit
 #contains_str = None
 contains_str = ['.zip', '.tgz', '.tar.gz', '.txt']
+#contains_str2 = ['']
+contains_str2 = ['lfw']
+##################################################
 
 rlt_list_file = bucket_name + '_key_list.txt'
 fp = codecs.open(rlt_list_file, 'w', encoding='utf-8')
@@ -57,20 +62,37 @@ while True:
 #        key_list = [it['key']
 #                    for it in items if contains_str in it['key'].lower()]
 #        if save_details:
-#            key_list2 = [
+#            key_list_detail = [
 #                it for it in items if contains_str in it['key'].lower()]
         key_list = []
-        key_list2 = []
+        key_list_detail = []
         for i in range(len(items)):
             for sub_str in contains_str:
                 if sub_str in items[i]['key'].lower():
                     key_list.append(items[i]['key'])
                     if save_details:
-                        key_list2.append(items[i])
+                        key_list_detail.append(items[i])
+                    break
     else:
         key_list = [it['key'] for it in items]
         if save_details:
-            key_list2 = [it for it in items]
+            key_list_detail = [it for it in items]
+
+    if contains_str2:
+        key_list_2 = []
+        key_list_detail_2 = []
+        for i in range(len(key_list)):
+            for sub_str in contains_str2:
+                if sub_str in key_list[i].lower():
+                    key_list_2.append(key_list[i])
+                    if save_details:
+                        key_list_detail_2.append(items[i])
+                    break
+
+        key_list = key_list_2
+        if save_details:
+            key_list_detail = key_list_detail_2
+
 
     # print key_list
     fetch_cnt = len(key_list)
@@ -87,8 +109,8 @@ while True:
         fp.write(it + '\n')
 
     if save_details:
-        #        json.dump(key_list2, fp2, indent=2)
-        for it in key_list2:
+        #        json.dump(key_list_detail, fp2, indent=2)
+        for it in key_list_detail:
             json.dump(it, fp2, indent=2)
             fp2.write(',\n')
 

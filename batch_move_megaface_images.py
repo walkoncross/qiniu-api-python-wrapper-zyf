@@ -7,38 +7,43 @@ Created on Fri Jul 07 19:01:49 2017
 """
 
 from qiniu import Auth
-from qiniu import BucketManager
 
-import json
-import codecs
+from qiniu import BucketManager
 
 from ak_sk import get_ak_sk
 
-
-#access_key, secret_key = get_ak_sk()
-access_key, secret_key = get_ak_sk('ak_sk_avaprod.json')
+# get ak,sk
+access_key, secret_key = get_ak_sk('./ak_sk_avatest.json')
 
 ##################################################
 # configs
-save_details = False
+bucket = 'identities-dataset'
+bucket2 = 'face-megaface-images'
+#prefix = 'Celeb'
+prefix = 'assets/megaface/identities_all/'
 
-bucket_name = 'ava-test'
-#prefix = 'lfw'
-prefix = None
-max_list_cnt = None  # set to None for no limit
-#contains_str = None
-contains_str = ['.zip', '.tgz', '.tar.gz', '.txt']
-#contains_str2 = ['']
-contains_str2 = ['lfw']
-##################################################
+prefix_len = len(prefix)
 
-rlt_list_file = bucket_name + '_key_list.txt'
-fp = codecs.open(rlt_list_file, 'w', encoding='utf-8')
+max_list_cnt = None
 
-if save_details:
-    rlt_list_file2 = bucket_name + '_key_list_details.json'
-    fp2 = codecs.open(rlt_list_file2, 'w', encoding='utf-8')
-    fp2.write('[\n')
+contains_str = None
+#contains_str = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
+# contains_str = ['.mat']
+contains_str2 = ['']
+# contains_str2 = ['lfw']
+##################################################333
+
+##################################################333
+# generate key in bucket2
+# def get_new_key(key):
+#     return key
+
+
+def get_new_key(key):
+    new_key = key[prefix_len:]
+    return new_key
+##################################################333
+
 
 # 初始化Auth状态
 q = Auth(access_key, secret_key)
@@ -46,10 +51,11 @@ q = Auth(access_key, secret_key)
 bktMgr = BucketManager(q)
 # 你要测试的空间， 并且这个key在你空间中存在
 
+
 marker = None
 while True:
     # 获取文件的状态信息
-    ret = bktMgr.list(bucket_name, prefix, marker, max_list_cnt)
+    ret = bktMgr.list(bucket, prefix, marker, max_list_cnt)
 
     if not ret[0]:
         print "No qualified files in the bucket"
@@ -58,24 +64,20 @@ while True:
     items = ret[0]['items']
 
     if contains_str:
-#        key_list = [it['key']
-#                    for it in items if contains_str in it['key'].lower()]
-#        if save_details:
-#            key_list_detail = [
-#                it for it in items if contains_str in it['key'].lower()]
+        #        key_list = [it['key']
+        #                    for it in items if contains_str in it['key'].lower()]
+        #        if save_details:
+        #            key_list_detail = [
+        # it for it in items if contains_str in it['key'].lower()]
         key_list = []
         key_list_detail = []
         for i in range(len(items)):
             for sub_str in contains_str:
                 if sub_str in items[i]['key'].lower():
                     key_list.append(items[i]['key'])
-                    if save_details:
-                        key_list_detail.append(items[i])
                     break
     else:
         key_list = [it['key'] for it in items]
-        if save_details:
-            key_list_detail = [it for it in items]
 
     if contains_str2:
         key_list_2 = []
@@ -84,14 +86,9 @@ while True:
             for sub_str in contains_str2:
                 if sub_str in key_list[i].lower():
                     key_list_2.append(key_list[i])
-                    if save_details:
-                        key_list_detail_2.append(items[i])
                     break
 
         key_list = key_list_2
-        if save_details:
-            key_list_detail = key_list_detail_2
-
 
     # print key_list
     fetch_cnt = len(key_list)
@@ -100,18 +97,18 @@ while True:
     first_n = min(fetch_cnt, 10)
     print "---> First %d files:" % first_n
     for i in range(first_n):
-        print '%d --> %s' % (i+1, key_list[i])
+        print '%d --> %s' % (i + 1, key_list[i])
 
     #json.dump(key_list, fp, indent=2)
 
-    for it in key_list:
-        fp.write(it + '\n')
-
-    if save_details:
-        #        json.dump(key_list_detail, fp2, indent=2)
-        for it in key_list_detail:
-            json.dump(it, fp2, indent=2)
-            fp2.write(',\n')
+    for key in key_list:
+        key2 = get_new_key(key)
+        ret2 = bktMgr.move(bucket, key, bucket2, key2)
+        print '\n==========bucket.move() returns:'
+        if ret2:
+            print ret2
+        else:
+            print 'Succeeded to move'
 
     if 'marker' in ret[0]:
         print 'Returned marker is: ', marker
@@ -123,9 +120,3 @@ while True:
     else:
         print 'No more files, list fininshed'
         break
-
-fp.close()
-
-if save_details:
-    fp2.write('"end of list, skip this item"]\n')
-    fp2.close()

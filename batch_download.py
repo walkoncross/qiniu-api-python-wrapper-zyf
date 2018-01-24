@@ -18,6 +18,9 @@ from ak_sk import get_ak_sk
 
 access_key, secret_key = get_ak_sk()
 
+##################################################
+# configs
+
 download_save_path = r'F:\FaceDataset-new\face-asian'
 if not osp.exists(download_save_path):
     os.makedirs(download_save_path)
@@ -36,6 +39,7 @@ prefix = 'face_asian'
 
 contains_str = None
 #contains_str = 'txt'
+##################################################
 
 
 #初始化Auth状态
