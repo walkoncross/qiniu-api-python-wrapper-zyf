@@ -1,50 +1,40 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Created on Fri Jul 07 19:01:49 2017
+Created on Mon Feb 05 06:08:07 2018
 
 @author: zhaoy
 """
-
-from qiniu import Auth
-
-from qiniu import BucketManager
-
-from ak_sk import get_ak_sk
+from advanced_operations import advanced_move_all
 
 
-access_key, secret_key = get_ak_sk()
+if __name__ == '__main__':
+    ##################################################
+    # configs
+    aksk_config = './ak_sk.json'
+    bucket = 'face-gender-train-0811-sphereface28-ft'
+    bucket2 = 'face-gender-train'
+    #prefix = 'Celeb'
+    prefix = ''
 
-bucket_name = 'face-ssh-fd'
-bucket_name2 = 'face-det-ssh-fd'
-#prefix = 'Celeb'
-prefix = None
+    prefix_len = len(prefix)
 
-contains_str = None
-#contains_str = 'SpecsOnFaces'
+    max_list_cnt = None
 
+    contain_str_list = None
+    #contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
+    # contain_str_list = ['.mat']
+    contain_str_list2 = ['']
+    # contain_str_list2 = ['lfw']
+    ##################################################
 
-#初始化Auth状态
-q = Auth(access_key, secret_key)
-#初始化BucketManager
-bktMgr = BucketManager(q)
-#你要测试的空间， 并且这个key在你空间中存在
+    def get_new_key(key):
+        #    new_key = key[prefix_len:]
+        new_key = 'train-results/gender-train-ftfrom-sphereface28-0808-0811/' + key
+        return new_key
 
-#获取文件的状态信息
-ret = bktMgr.list(bucket_name, prefix)
-
-items = ret[0]['items']
-
-if contains_str:
-    key_list = [it['key'] for it in items if contains_str in it['key'].lower()]
-else:
-    key_list = [it['key'] for it in items]
-print key_list
-
-for key in key_list:
-    ret2 = bktMgr.move(bucket_name, key, bucket_name2, key)
-    print '\n==========bucket.move() returns:'
-    if ret2:
-        print ret2
-    else:
-        print 'Succeeded to move'
+    advanced_move_all(aksk_config, bucket, prefix,
+                      bucket2, get_new_key,
+                      max_list_cnt,
+                      contain_str_list, contain_str_list2
+                      )

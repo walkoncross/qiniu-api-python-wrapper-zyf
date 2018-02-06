@@ -5,62 +5,40 @@ Created on Fri Jul 07 19:01:49 2017
 
 @author: zhaoy
 """
-
-from qiniu import Auth
-
-from qiniu import BucketManager
-
-from ak_sk import get_ak_sk
-
-# get ak,sk
-access_key, secret_key = get_ak_sk()
-
-##################################################
-# configs
-bucket = 'face-recog-sphereface-webface'
-bucket2 = bucket
-#prefix = 'lfw'
-prefix = 'sphereface-64-prototxt/sphereface_64_train_bs256_1007'
-
-contains_str = None
-#contains_str = 'celeb'
-
-##################################################333
-
-##################################################333
-# generate key in bucket2
-# def get_new_key(key):
-#     return key
+from advanced_operations import advanced_move_all
 
 
-def get_new_key(key):
-    new_key = key.replace('sphereface-64-prototxt', 'train-results')
-    return new_key
-##################################################333
+if __name__ == '__main__':
+    ##################################################
+    # configs
+    aksk_config = './ak_sk.json'
+    bucket = 'face-recog-sphereface-vggface2'
+    bucket2 = bucket
+    #prefix = 'lfw'
+    prefix = '/'
 
+    max_list_cnt = None
+    contain_str_list = None
+    #contain_str_list2 = 'celeb'
+    contain_str_list2 = None
 
-#初始化Auth状态
-q = Auth(access_key, secret_key)
-#初始化BucketManager
-bktMgr = BucketManager(q)
-#你要测试的空间， 并且这个key在你空间中存在
+    ##################################################
 
-#获取文件的状态信息
-ret = bktMgr.list(bucket, prefix)
+    ##################################################
+    # generate key in bucket2
+    # def get_new_key(key):
+    #     return key
 
-items = ret[0]['items']
+    def get_new_key(key):
+        #    new_key = key.replace('sphereface-64-prototxt', 'train-results')
+        #    new_key = 'eval-results/' + key
+        #    new_key = key.replace('resultss', 'results/s')
+        new_key = key[1:]
+        return new_key
+    ##################################################
 
-if contains_str:
-    key_list = [it['key'] for it in items if contains_str in it['key'].lower()]
-else:
-    key_list = [it['key'] for it in items]
-print key_list
-
-for key in key_list:
-    key2 = get_new_key(key)
-    ret2 = bktMgr.move(bucket, key, bucket2, key2)
-    print '\n==========bucket.move() returns:'
-    if ret2:
-        print ret2
-    else:
-        print 'Succeeded to move'
+    advanced_move_all(aksk_config, bucket, prefix,
+                      bucket2, get_new_key,
+                      max_list_cnt,
+                      contain_str_list, contain_str_list2
+                      )
