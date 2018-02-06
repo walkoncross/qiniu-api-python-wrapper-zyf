@@ -18,7 +18,7 @@ from qiniu import BucketManager
 from ak_sk import get_ak_sk
 
 
-def get_bucket_manager(aksk_config=None, access_key=None, secret_key=None):
+def get_qiniu_auth(aksk_config=None, access_key=None, secret_key=None):
     if aksk_config:
         if isinstance(aksk_config, str):
             ak, sk = get_ak_sk(aksk_config)
@@ -31,11 +31,21 @@ def get_bucket_manager(aksk_config=None, access_key=None, secret_key=None):
 
     print 'ak: ', ak
     print 'sk: ', sk
-    
+
     # 初始化Auth状态
-    q = Auth(ak, sk)
+    auth = Auth(ak, sk)
+
+    return auth
+
+
+def get_bucket_manager(aksk_config=None,
+                       access_key=None, secret_key=None,
+                       auth=None):
+    if auth is None:
+        auth = get_qiniu_auth(aksk_config, access_key, secret_key)
+
     # 初始化BucketManager
-    bkt_mgr = BucketManager(q)
+    bkt_mgr = BucketManager(auth)
 
     return bkt_mgr
 
@@ -48,7 +58,6 @@ def advanced_list_all(aksk_config,
                       save_dir=None,
                       save_details=False,
                       access_key=None, secret_key=None):
-
     '''
     ##################################################
     # configs
@@ -182,8 +191,6 @@ def advanced_move_all(aksk_config,
                       contain_str_list=None,
                       contain_str_list2=None,
                       access_key=None, secret_key=None):
-
-
     '''
     ##################################################
     # configs
@@ -376,8 +383,6 @@ def advanced_download_all(aksk_config,
                           download_expire_time=-1,
                           overwrite_local_file=False,
                           access_key=None, secret_key=None):
-
-
     '''
     ##################################################
     # configs
@@ -404,7 +409,10 @@ def advanced_download_all(aksk_config,
     if download_expire_time <= 0:
         download_expire_time = 3600
 
-    bkt_mgr = get_bucket_manager(aksk_config, access_key, secret_key)
+    # bkt_mgr = get_bucket_manager(aksk_config, access_key, secret_key)
+
+    q_auth = get_qiniu_auth(aksk_config, access_key, secret_key)
+    bkt_mgr = get_bucket_manager(auth=q_auth)
 
     marker = None
     while True:
@@ -462,7 +470,7 @@ def advanced_download_all(aksk_config,
             #        continue
             #
             # makedirs for key in the form "xxx/yyy/zzz"
-            if '/' in key:  
+            if '/' in key:
                 osp.makedirs(osp.join(download_save_path, osp.split(key)[0]))
 
             save_fn = osp.join(download_save_path, key)
@@ -477,7 +485,7 @@ def advanced_download_all(aksk_config,
 
             print '---> download url: ' + base_url
             # 可以设置token过期时间
-            private_url = q.private_download_url(
+            private_url = q_auth.private_download_url(
                 base_url, download_expire_time)
             print '---> private_url: ' + private_url
             r = requests.get(private_url)

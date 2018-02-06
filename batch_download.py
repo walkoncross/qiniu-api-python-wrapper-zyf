@@ -18,12 +18,12 @@ if __name__ == '__main__':
     bucket_domain = 'http://outj1l7fd.bkt.clouddn.com'
     prefix = 'face_asian'
 
-    max_list_cnt = None
+    max_list_cnt = 10
     contain_str_list = None
     contain_str_list2 = None
     #contain_str_list = 'txt'
 
-    download_save_path = r'F:\FaceDataset-new\face-asian'
+    download_save_path = r'./bkt_download_files/face-asian'
     overwrite_local_file = False
     download_expire_time = 3600
     ##################################################

@@ -18,7 +18,7 @@ if __name__ == '__main__':
     bucket = 'face-webface2'
     #prefix = 'lfw'
     prefix = 'CASIA-aligned/'
-    max_list_cnt = None
+    max_list_cnt = 50
 
     contain_str_list = None
     #contain_str_list = ['.bin']
