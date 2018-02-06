@@ -12,8 +12,8 @@ import json
 
 import requests
 
-from qiniu import Auth
-from qiniu import BucketManager
+from qiniu import Auth, BucketManager
+from qiniu import put_file, etag, urlsafe_base64_encode
 
 from ak_sk import get_ak_sk
 
@@ -371,6 +371,78 @@ def advanced_delete_all(aksk_config,
         else:
             print '\n===> No more files, list fininshed'
             break
+
+
+def upload_file(localfile, auth, bucket, key, upload_expire_time):
+    token = auth.upload_token(bucket, key, upload_expire_time)
+
+    ret, info = put_file(token, key, localfile)
+
+    if ret['key'] == key and ret['hash'] == etag(localfile):
+        return True
+    else:
+        print 'Failed to upload ', localfile
+        print 'failed info: {}'.format(info)
+        return False
+
+
+def get_file_list(local_path):
+    file_list = []
+
+    for (root, dirs, files) in os.walk(local_path):
+        for ff in files:
+            file_list.append(osp.join(root, ff))
+
+    return file_list
+
+
+def advanced_upload_paths(aksk_config,
+                          bucket,
+                          local_paths,
+                          prefix=None,
+                          upload_expire_time=-1,
+                          access_key=None, secret_key=None):
+
+    if upload_expire_time <= 0:
+        upload_expire_time = 3600
+
+    q_auth = get_qiniu_auth(aksk_config, access_key, secret_key)
+
+    print '\n===> Upload local paths: ', local_paths
+
+    suc_cnt = 0
+    fail_cnt = 0
+
+    if prefix is None:
+        prefix = ''
+
+    for path in local_paths:
+        print '\n===> Upload path: ', path
+
+        if osp.isfile(path):
+            localfile = path
+            key = osp.join(prefix, path)
+            ret = upload_file(localfile, q_auth, bucket,
+                              key, upload_expire_time)
+            if ret:
+                suc_cnt += 1
+            else:
+                fail_cnt += 1
+
+        elif osp.isfile(path):
+            file_list = get_file_list(path)
+            for ff in file_list:
+                localfile = ff
+                key = osp.join(prefix, ff)
+                ret = upload_file(localfile, q_auth, bucket,
+                                  key, upload_expire_time)
+                if ret:
+                    suc_cnt += 1
+                else:
+                    fail_cnt += 1
+
+    print '\n===> Tried to upload %d files:' % (suc_cnt + fail_cnt)
+    print '\n         %d succeeded, %d failed' % (suc_cnt, fail_cnt)
 
 
 def advanced_download_all(aksk_config,
