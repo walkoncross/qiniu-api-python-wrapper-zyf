@@ -668,13 +668,19 @@ def advanced_download_keylist(key_list,
             if not osp.exists(subdir):
                 os.makedirs(subdir)
 
+        cnt += 1
+
         save_fn = osp.join(download_save_path, key)
         if not overwrite_local_file and osp.exists(save_fn):
             print '---> File already exists, will not download this one'
+
+            if cnt % 10 == 0:
+                print "\n===> %d files processed\n" % cnt
+
             continue
 
         if not bucket_domain.startswith('http'):
-            base_url = 'http://%s/%s' % (bucket_domain, key)
+            base_url = 'http://%s/%s' % (bucket_domain, ky)
         else:
             base_url = '%s/%s' % (bucket_domain, key)
 
@@ -697,7 +703,7 @@ def advanced_download_keylist(key_list,
 
         r.close()
 
-        if cnt % 100 == 0:
+        if cnt % 10 == 0:
             print "\n===> %d files processed\n" % cnt
 
     print "\n===> %d files processed\n" % cnt
