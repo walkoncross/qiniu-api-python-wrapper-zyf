@@ -273,14 +273,14 @@ def advanced_move_all(aksk_config,
             print '\n===> Moving {} into {}'.format(
                 osp.join(bucket, key), osp.join(bucket2, key2)
             )
-            if ret2:
+            if not ret2 or not ret2[0] or ret:
+                print '---> Succeeded to move'
+                suc_cnt += 1
+            else:
                 print '---> Failed to move'
                 print '---> bucket.move() returns:'
                 print ret2
                 fail_cnt += 1
-            else:
-                print '---> Succeeded to move'
-                suc_cnt += 1
 
         if 'marker' in ret[0]:
             print 'Returned marker is: ', marker
@@ -543,7 +543,9 @@ def advanced_download_all(aksk_config,
             #
             # makedirs for key in the form "xxx/yyy/zzz"
             if '/' in key:
-                osp.makedirs(osp.join(download_save_path, osp.split(key)[0]))
+                subdir = osp.join(download_save_path, osp.split(key)[0])
+                if not osp.exists(subdir):
+                    os.makedirs(subdir)
 
             save_fn = osp.join(download_save_path, key)
             if not overwrite_local_file and osp.exists(save_fn):
