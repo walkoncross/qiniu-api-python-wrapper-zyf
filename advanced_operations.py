@@ -76,6 +76,9 @@ def advanced_list_all(aksk_config,
     # contain_str_list2 = ['lfw']
     ##################################################
     '''
+    if max_list_cnt is not None and max_list_cnt < 0:
+        max_list_cnt = None
+
     if save_dir is None:
         save_dir = './'
     elif not osp.exists(save_dir):
@@ -219,6 +222,9 @@ def advanced_move_all(aksk_config,
     suc_cnt = 0
     fail_cnt = 0
 
+    if max_list_cnt is not None and max_list_cnt < 0:
+        max_list_cnt = None
+
     if new_key_func is None:
         get_new_key = default_new_key_func
     else:
@@ -315,6 +321,9 @@ def advanced_delete_all(aksk_config,
                         access_key=None, secret_key=None):
 
     cnt = 0
+
+    if max_list_cnt is not None and max_list_cnt < 0:
+        max_list_cnt = None
 
     bkt_mgr = get_bucket_manager(aksk_config, access_key, secret_key)
 
@@ -487,6 +496,10 @@ def advanced_download_all(aksk_config,
     # contain_str_list = 'txt'
     ##################################################
     '''
+
+    if max_list_cnt is not None and max_list_cnt < 0:
+        max_list_cnt = None
+
     if not download_save_path:
         download_save_path = r'./bkt_download_files'
 
@@ -506,9 +519,9 @@ def advanced_download_all(aksk_config,
         # 获取文件的状态信息
         print '\n===> Input marker is: ', marker
         ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
-        print '---> bucket.list() returned Ret: ', ret
+        # print '---> bucket.list() returned Ret: ', ret
         print '---> bucket.list() returned EOF: ', eof
-        print '---> bucket.list() returned Info: ', info
+        # print '---> bucket.list() returned Info: ', info
 
         if not ret:
             print "\n===> No qualified files in the bucket"
@@ -680,7 +693,7 @@ def advanced_download_keylist(key_list,
             continue
 
         if not bucket_domain.startswith('http'):
-            base_url = 'http://%s/%s' % (bucket_domain, ky)
+            base_url = 'http://%s/%s' % (bucket_domain, key)
         else:
             base_url = '%s/%s' % (bucket_domain, key)
 
