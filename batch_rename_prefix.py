@@ -6,20 +6,22 @@ Created on Fri Jul 07 19:01:49 2017
 @author: zhaoy
 """
 from advanced_operations import advanced_move_all
+import os.path as osp
 
 
 if __name__ == '__main__':
     ##################################################
     # configs
     aksk_config = './ak_sk.json'
-    bucket = 'face-recog-sphereface-vggface2'
+    bucket = 'face-insight'
     bucket2 = bucket
     #prefix = 'lfw'
-    prefix = '/'
+    prefix = 'train-logs/rlt_parse_log-train-log'
 
     max_list_cnt = None
     contain_str_list = None
-    #contain_str_list2 = 'celeb'
+#    contain_str_list = ['insightface-0306']
+#    contain_str_list2 = ['b3.5']
     contain_str_list2 = None
 
     ##################################################
@@ -32,8 +34,12 @@ if __name__ == '__main__':
     def get_new_key(key):
         #    new_key = key.replace('sphereface-64-prototxt', 'train-results')
         #    new_key = 'eval-results/' + key
-        #    new_key = key.replace('resultss', 'results/s')
-        new_key = key[1:]
+        new_key = key.replace('rlt_parse_log-train-log', 'rlt-parse-train-log')
+#        new_key = key[1:]
+#        new_key = key.replace('idcard1M-features-', '')
+#        new_key = 'eval-results/insightface-r100-ms1m-zyf-0221-ep80/' + key
+#        new_key = key.replace('cmc', 'eval-results/insightface-r100-ms1m-zyf-0221-ep80/cmc')
+
         return new_key
     ##################################################
 

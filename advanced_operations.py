@@ -65,15 +65,15 @@ def advanced_list_all(aksk_config,
     save_details = False
 
     bucket = 'face-megaface-eval'
-    #prefix = 'lfw'
+    # prefix = 'lfw'
     prefix = 'eval-results/'
     max_list_cnt = None
 
     contain_str_list = None
-    #contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
-    #contain_str_list = ['.mat']
+    # contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
+    # contain_str_list = ['.mat']
     contain_str_list2 = ['']
-    #contain_str_list2 = ['lfw']
+    # contain_str_list2 = ['lfw']
     ##################################################
     '''
     if save_dir is None:
@@ -95,13 +95,17 @@ def advanced_list_all(aksk_config,
     marker = None
     while True:
         # 获取文件的状态信息
-        ret = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        print '\n===> Input marker is: ', marker
+        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        # print '---> bucket.list() returned Ret: ', ret
+        print '---> bucket.list() returned EOF: ', eof
+        print '---> bucket.list() returned Info: ', info
 
-        if not ret[0]:
-            print "No qualified files in the bucket"
+        if not ret:
+            print "\n===> No qualified files in the bucket"
             break
 
-        items = ret[0]['items']
+        items = ret['items']
 
         if contain_str_list:
             #        key_list = [it['key']
@@ -140,39 +144,41 @@ def advanced_list_all(aksk_config,
 
         # print key_list
         fetch_cnt = len(key_list)
-        print "%d qualified files found" % fetch_cnt
+        print "\n===> %d qualified files found" % fetch_cnt
 
         first_n = min(fetch_cnt, 10)
         print "---> First %d files:" % first_n
         for i in range(first_n):
             print '%d --> %s' % (i + 1, key_list[i])
 
-        #json.dump(key_list, fp, indent=2)
+        # json.dump(key_list, fp, indent=2)
 
         for it in key_list:
             fp.write(it + '\n')
+        fp.flush()
 
         if save_details:
             #        json.dump(key_list_detail, fp2, indent=2)
             for it in key_list_detail:
                 json.dump(it, fp2, indent=2)
                 fp2.write(',\n')
+            fp2.flush()
 
-        if 'marker' in ret[0]:
-            print 'Returned marker is: ', marker
-            print 'More files to list'
-            marker = ret[0]['marker']
+        if 'marker' in ret:
+            marker = str(ret['marker'])
+            print '\n===> bucket.list() returned marker is: ', marker
+            print '\n===> More files to list\n'
 
             if max_list_cnt:
                 max_list_cnt = max_list_cnt - fetch_cnt
         else:
-            print 'No more files, list fininshed'
+            print '\n===> No more files, list fininshed'
             break
 
     fp.close()
 
     if save_details:
-        fp2.write('"end of list, skip this item"]\n')
+        fp2.write('\n===> end of list, skip this item\n')
         fp2.close()
 
     return key_list
@@ -194,20 +200,20 @@ def advanced_move_all(aksk_config,
     '''
     ##################################################
     # configs
-    #save_details = False
+    # save_details = False
     #
-    #bucket = 'face-webface2'
-    ##prefix = 'lfw'
-    #prefix = 'CASIA-aligned/'
-    #max_list_cnt = None
+    # bucket = 'face-webface2'
+    # prefix = 'lfw'
+    # prefix = 'CASIA-aligned/'
+    # max_list_cnt = None
     #
-    #contain_str_list = None
-    ##contain_str_list = ['.bin']
-    ##contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
-    ## contain_str_list = ['log_1007_2.txt', 'extract-log']
-    #contain_str_list2 = None
-    #contain_str_list2 = ['.bin']
-    #contain_str_list2 = ['lfw']
+    # contain_str_list = None
+    # contain_str_list = ['.bin']
+    # contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
+    # contain_str_list = ['log_1007_2.txt', 'extract-log']
+    # contain_str_list2 = None
+    # contain_str_list2 = ['.bin']
+    # contain_str_list2 = ['lfw']
     ##################################################
     '''
     suc_cnt = 0
@@ -223,13 +229,17 @@ def advanced_move_all(aksk_config,
     marker = None
     while True:
         # 获取文件的状态信息
-        ret = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        print '\n===> Input marker is: ', marker
+        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        # print '---> bucket.list() returned Ret: ', ret
+        print '---> bucket.list() returned EOF: ', eof
+        # print '---> bucket.list() returned Info: ', info
 
-        if not ret[0]:
-            print "No qualified files in the bucket"
+        if not ret:
+            print "\n===> No qualified files in the bucket"
             break
 
-        items = ret[0]['items']
+        items = ret['items']
 
         if contain_str_list:
             #        key_list = [it['key']
@@ -258,14 +268,14 @@ def advanced_move_all(aksk_config,
 
         # print key_list
         fetch_cnt = len(key_list)
-        print "%d qualified files found" % fetch_cnt
+        print "\n===> %d qualified files found" % fetch_cnt
 
         first_n = min(fetch_cnt, 10)
         print "---> First %d files:" % first_n
         for i in range(first_n):
             print '%d --> %s' % (i + 1, key_list[i])
 
-        #json.dump(key_list, fp, indent=2)
+        # json.dump(key_list, fp, indent=2)
 
         for key in key_list:
             key2 = get_new_key(key)
@@ -278,14 +288,14 @@ def advanced_move_all(aksk_config,
                 suc_cnt += 1
             else:
                 print '---> Failed to move'
-                print '---> bucket.move() returns:'
+                print '---> bucket.move() returned:'
                 print ret2
                 fail_cnt += 1
 
-        if 'marker' in ret[0]:
-            print 'Returned marker is: ', marker
-            print 'More files to list'
-            marker = ret[0]['marker']
+        if 'marker' in ret:
+            marker = str(ret['marker'])
+            print '\n===> bucket.list() returned marker is: ', marker
+            print '\n===> More files to list\n'
 
             if max_list_cnt:
                 max_list_cnt = max_list_cnt - fetch_cnt
@@ -311,13 +321,17 @@ def advanced_delete_all(aksk_config,
     marker = None
     while True:
         # 获取文件的状态信息
-        ret = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        print '\n===> Input marker is: ', marker
+        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        # print '---> bucket.list() returned Ret: ', ret
+        print '---> bucket.list() returned EOF: ', eof
+        # print '---> bucket.list() returned Info: ', info
 
-        if not ret[0]:
+        if not ret:
             print "===> No qualified files in the bucket"
             break
 
-        items = ret[0]['items']
+        items = ret['items']
 
         if contain_str_list:
             #        key_list = [it['key']
@@ -361,10 +375,10 @@ def advanced_delete_all(aksk_config,
             cnt += 1
             print '\n===> %d files deleted\n' % cnt
 
-        if 'marker' in ret[0]:
-            print '\n===> Returned marker is: ', marker
-            print '       More files to list'
-            marker = ret[0]['marker']
+        if 'marker' in ret:
+            marker = str(ret['marker'])
+            print '\n===> returned marker is: ', marker
+            print '       More files to list\n'
 
             if max_list_cnt:
                 max_list_cnt = max_list_cnt - fetch_cnt
@@ -377,12 +391,13 @@ def upload_file(localfile, auth, bucket, key, upload_expire_time):
     token = auth.upload_token(bucket, key, upload_expire_time)
 
     ret, info = put_file(token, key, localfile)
+    print '---> bucket.list() returned Info: ', info
 
     if ret['key'] == key and ret['hash'] == etag(localfile):
         return True
     else:
-        print 'Failed to upload ', localfile
-        print 'failed info: {}'.format(info)
+        print '\n===> Failed to upload ', localfile
+        print '\n===> Failed info: {}'.format(info)
         return False
 
 
@@ -442,7 +457,7 @@ def advanced_upload_paths(aksk_config,
                     fail_cnt += 1
 
     print '\n===> Tried to upload %d files:' % (suc_cnt + fail_cnt)
-    print '\n         %d succeeded, %d failed' % (suc_cnt, fail_cnt)
+    print '\n         %d succeeded, %d Failed' % (suc_cnt, fail_cnt)
 
 
 def advanced_download_all(aksk_config,
@@ -459,17 +474,17 @@ def advanced_download_all(aksk_config,
     ##################################################
     # configs
 
-    #bucket = 'facex-train-sphereface-bs256-0807'
-    #bucket_domain = 'http://oubom5rzl.bkt.clouddn.com'
-    #prefix = 'lfw'
-    #prefix = None
+    # bucket = 'facex-train-sphereface-bs256-0807'
+    # bucket_domain = 'http://oubom5rzl.bkt.clouddn.com'
+    # prefix = 'lfw'
+    # prefix = None
 
     bucket = 'face-asian'
     bucket_domain = 'http://outj1l7fd.bkt.clouddn.com'
     prefix = 'face_asian'
 
     contain_str_list = None
-    #contain_str_list = 'txt'
+    # contain_str_list = 'txt'
     ##################################################
     '''
     if not download_save_path:
@@ -489,13 +504,17 @@ def advanced_download_all(aksk_config,
     marker = None
     while True:
         # 获取文件的状态信息
-        ret = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        print '\n===> Input marker is: ', marker
+        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        print '---> bucket.list() returned Ret: ', ret
+        print '---> bucket.list() returned EOF: ', eof
+        print '---> bucket.list() returned Info: ', info
 
-        if not ret[0]:
-            print "No qualified files in the bucket"
+        if not ret:
+            print "\n===> No qualified files in the bucket"
             break
 
-        items = ret[0]['items']
+        items = ret['items']
 
         if contain_str_list:
             #        key_list = [it['key']
@@ -527,14 +546,14 @@ def advanced_download_all(aksk_config,
 
         # print key_list
         fetch_cnt = len(key_list)
-        print "%d qualified files found" % fetch_cnt
+        print "\n===> %d qualified files found" % fetch_cnt
 
         first_n = min(fetch_cnt, 10)
         print "---> First %d files:" % first_n
         for i in range(first_n):
             print '%d --> %s' % (i + 1, key_list[i])
 
-        #json.dump(key_list, fp, indent=2)
+        # json.dump(key_list, fp, indent=2)
 
         for key in key_list:
             # 有两种方式构造base_url的形式
@@ -561,27 +580,118 @@ def advanced_download_all(aksk_config,
             # 可以设置token过期时间
             private_url = q_auth.private_download_url(
                 base_url, download_expire_time)
+
             print '---> private_url: ' + private_url
             r = requests.get(private_url)
 
             if r.status_code == 200:
-                print 'requests.get(private_url) ---> Succeeded'
+                print '---> requests.get(private_url) ---> Succeeded'
 
                 fp = open(save_fn, 'wb')
                 fp.write(r.content)
                 fp.close()
             else:
-                print 'requests.get(private_url) ---> Failed'
+                print '---> requests.get(private_url) ---> Failed'
 
             r.close()
 
-        if 'marker' in ret[0]:
-            print 'Returned marker is: ', marker
-            print 'More files to list'
-            marker = ret[0]['marker']
+        if 'marker' in ret:
+            # print '---> bucket.list() returned info is: ', ret
+            marker = str(ret['marker'])
+            print '\n===> bucket.list() returned marker is: ', marker
+            print '\n===> More files to list\n'
 
             if max_list_cnt:
                 max_list_cnt = max_list_cnt - fetch_cnt
         else:
-            print 'No more files, list fininshed'
+            print '\n===> No more files, list fininshed'
             break
+
+
+def advanced_download_keylist(key_list,
+                              aksk_config,
+                              bucket_domain,
+                              download_save_path=None,
+                              download_expire_time=-1,
+                              overwrite_local_file=False,
+                              access_key=None, secret_key=None):
+    '''
+    ##################################################
+    # configs
+    # key_list = 'bkt_key_list.txt'
+    # aksk_config = 'ava_aksk.json'
+    # bucket_domain = 'http://oubom5rzl.bkt.clouddn.com'
+
+    bucket_domain = 'http://outj1l7fd.bkt.clouddn.com'
+    ##################################################
+    '''
+    if not download_save_path:
+        download_save_path = r'./bkt_download_files'
+
+    if not osp.exists(download_save_path):
+        os.makedirs(download_save_path)
+
+    if download_expire_time <= 0:
+        download_expire_time = 3600
+
+    # bkt_mgr = get_bucket_manager(aksk_config, access_key, secret_key)
+
+    q_auth = get_qiniu_auth(aksk_config, access_key, secret_key)
+    # bkt_mgr = get_bucket_manager(auth=q_auth)
+
+    if osp.isfile(key_list):
+        fp = open(key_list, 'r')
+        key_list = fp.readlines()
+        fp.close()
+
+    # print key_list
+    fetch_cnt = len(key_list)
+    print "\n===> %d qualified files found" % fetch_cnt
+
+    first_n = min(fetch_cnt, 10)
+    print "---> First %d files:" % first_n
+    for i in range(first_n):
+        print '%d --> %s' % (i + 1, key_list[i])
+
+        # json.dump(key_list, fp, indent=2)
+
+    for key in key_list:
+        key = key.strip()
+        # 有两种方式构造base_url的形式
+        #    if '28' not in key:
+        #        continue
+        #
+        # makedirs for key in the form "xxx/yyy/zzz"
+        if '/' in key:
+            subdir = osp.join(download_save_path, osp.split(key)[0])
+            if not osp.exists(subdir):
+                os.makedirs(subdir)
+
+        save_fn = osp.join(download_save_path, key)
+        if not overwrite_local_file and osp.exists(save_fn):
+            print '---> File already exists, will not download this one'
+            continue
+
+        if not bucket_domain.startswith('http'):
+            base_url = 'http://%s/%s' % (bucket_domain, key)
+        else:
+            base_url = '%s/%s' % (bucket_domain, key)
+
+        print '---> download url: ' + base_url
+        # 可以设置token过期时间
+        private_url = q_auth.private_download_url(
+            base_url, download_expire_time)
+
+        print '---> private_url: ' + private_url
+        r = requests.get(private_url)
+
+        if r.status_code == 200:
+            print '---> requests.get(private_url) ---> Succeeded'
+
+            fp = open(save_fn, 'wb')
+            fp.write(r.content)
+            fp.close()
+        else:
+            print '---> requests.get(private_url) ---> Failed'
+
+        r.close()

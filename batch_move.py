@@ -12,8 +12,8 @@ if __name__ == '__main__':
     ##################################################
     # configs
     aksk_config = './ak_sk.json'
-    bucket = 'face-gender-train-0811-sphereface28-ft'
-    bucket2 = 'face-gender-train'
+    bucket = 'face-recog-thresholds'
+    bucket2 = 'face-model-thresholds'
     #prefix = 'Celeb'
     prefix = ''
 
@@ -23,14 +23,14 @@ if __name__ == '__main__':
 
     contain_str_list = None
     #contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
-    # contain_str_list = ['.mat']
-    contain_str_list2 = ['']
+#    contain_str_list = ['.zip']
+    contain_str_list2 = None
     # contain_str_list2 = ['lfw']
     ##################################################
 
     def get_new_key(key):
         #    new_key = key[prefix_len:]
-        new_key = 'train-results/gender-train-ftfrom-sphereface28-0808-0811/' + key
+        new_key = key
         return new_key
 
     advanced_move_all(aksk_config, bucket, prefix,

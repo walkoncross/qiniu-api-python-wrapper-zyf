@@ -15,13 +15,15 @@ if __name__ == '__main__':
     # configs
     aksk_config = './ak_sk.json'
 
-    bucket = 'face-webface2'
+    bucket = 'face-megaface-eval'
     #prefix = 'lfw'
-    prefix = 'CASIA-aligned/'
-    max_list_cnt = 50
+#    prefix = 'CASIA-aligned/'
+    prefix = 'eval-resultsL'
+    max_list_cnt = None
 
     contain_str_list = None
-    #contain_str_list = ['.bin']
+#    contain_str_list = ['ch', 'co', 'me', 'ad', 'ls']
+#    contain_str_list = ['insightface-r100-ms1m-zyf-0221-ep80']
     #contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
     # contain_str_list = ['log_1007_2.txt', 'extract-log']
     contain_str_list2 = None
