@@ -655,6 +655,7 @@ def advanced_download_keylist(key_list,
 
         # json.dump(key_list, fp, indent=2)
 
+    cnt = 0
     for key in key_list:
         key = key.strip()
         # 有两种方式构造base_url的形式
@@ -695,3 +696,8 @@ def advanced_download_keylist(key_list,
             print '---> requests.get(private_url) ---> Failed'
 
         r.close()
+
+        if cnt % 100 == 0:
+            print "\n===> %d files processed\n" % cnt
+
+    print "\n===> %d files processed\n" % cnt
