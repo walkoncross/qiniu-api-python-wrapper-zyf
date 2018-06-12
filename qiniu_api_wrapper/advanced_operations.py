@@ -446,6 +446,7 @@ def advanced_upload_paths(aksk_config,
         if osp.isfile(path):
             localfile = path
             key = osp.join(prefix, path)
+            key = key.replace('\\', ' /')
             ret = upload_file(localfile, q_auth, bucket,
                               key, upload_expire_time)
             if ret:
@@ -458,6 +459,7 @@ def advanced_upload_paths(aksk_config,
             for ff in file_list:
                 localfile = ff
                 key = osp.join(prefix, ff)
+                key = key.replace('\\', ' /')
                 ret = upload_file(localfile, q_auth, bucket,
                                   key, upload_expire_time)
                 if ret:
