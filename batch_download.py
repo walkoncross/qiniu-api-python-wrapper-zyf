@@ -15,7 +15,7 @@ if __name__ == '__main__':
     aksk_config = './ak_sk.json'
 
     bucket = 'face-asian'
-    bucket_domain = 'http://outj1l7fd.bkt.clouddn.com'
+    bucket_domain = 'http://xxxxx.bkt.clouddn.com'
     prefix = 'face_asian'
 
     max_list_cnt = 10
