@@ -20,8 +20,13 @@ if __name__ == '__main__':
 
     max_list_cnt = 10
     contain_str_list = None
+#    contain_str_list = ['ch', 'co', 'me', 'ad', 'ls']
+#    contain_str_list = ['insightface-r100-ms1m-zyf-0221-ep80']
+    #contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
+    # contain_str_list = ['log_1007_2.txt', 'extract-log']
     contain_str_list2 = None
-    #contain_str_list = 'txt'
+    #contain_str_list2 = ['.bin']
+    #contain_str_list2 = ['lfw']
 
     download_save_path = r'./bkt_download_files/face-asian'
     overwrite_local_file = False
