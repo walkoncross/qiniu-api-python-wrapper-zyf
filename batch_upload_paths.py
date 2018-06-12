@@ -22,8 +22,8 @@ if __name__ == '__main__':
     upload_expire_time = -1
     ##################################################
 
-advanced_upload_paths(aksk_config,
-                      bucket,
-                      local_paths,
-                      prefix,
-                      upload_expire_time)
+    advanced_upload_paths(aksk_config,
+                          bucket,
+                          local_paths,
+                          prefix,
+                          upload_expire_time)
