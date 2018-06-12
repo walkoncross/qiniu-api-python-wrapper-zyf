@@ -480,7 +480,8 @@ def advanced_download_all(aksk_config,
                           download_save_path=None,
                           download_expire_time=-1,
                           overwrite_local_file=False,
-                          access_key=None, secret_key=None):
+                          access_key=None, secret_key=None,
+                          max_try=3):
     '''
     ##################################################
     # configs
@@ -597,21 +598,29 @@ def advanced_download_all(aksk_config,
                 base_url, download_expire_time)
 
             print '---> private_url: ' + private_url
-            # r = requests.get(private_url)
 
-            # fix a bug according:
-            # https://github.com/requests/requests/issues/3975
-            with requests.get(private_url) as r:
-                if r.status_code == 200:
-                    print '---> requests.get(private_url) ---> Succeeded'
+            for i in range(max_try):
+                try:
+                    # r = requests.get(private_url)
 
-                    fp = open(save_fn, 'wb')
-                    fp.write(r.content)
-                    fp.close()
-                else:
-                    print '---> requests.get(private_url) ---> Failed'
+                    # fix a bug according:
+                    # https://github.com/requests/requests/issues/3975
+                    with requests.get(private_url) as r:
+                        if r.status_code == 200:
+                            print '---> requests.get(private_url) ---> Succeeded'
 
-                r.close()
+                            fp = open(save_fn, 'wb')
+                            fp.write(r.content)
+                            fp.close()
+                        else:
+                            print '---> requests.get(private_url) ---> Failed'
+
+                        r.close()
+
+                    break
+                except Exception as _e:
+                    print '---> requests.get(private_url) ---> Failed with Exception: ' + str(_e)
+                    print '---> will try again (Try #%d)' % (i + 1)
 
         if 'marker' in ret:
             # print '---> bucket.list() returned info is: ', ret
@@ -632,7 +641,8 @@ def advanced_download_keylist(key_list,
                               download_save_path=None,
                               download_expire_time=-1,
                               overwrite_local_file=False,
-                              access_key=None, secret_key=None):
+                              access_key=None, secret_key=None,
+                              max_try=3):
     '''
     ##################################################
     # configs
@@ -708,20 +718,26 @@ def advanced_download_keylist(key_list,
             base_url, download_expire_time)
 
         print '---> private_url: ' + private_url
-        # r = requests.get(private_url)
-        # fix a bug according:
-        # https://github.com/requests/requests/issues/3975
-        with requests.get(private_url) as r:
-            if r.status_code == 200:
-                print '---> requests.get(private_url) ---> Succeeded'
 
-                fp = open(save_fn, 'wb')
-                fp.write(r.content)
-                fp.close()
-            else:
-                print '---> requests.get(private_url) ---> Failed'
+        for i in range(max_try):
+            try:
+                # r = requests.get(private_url)
+                # fix a bug according:
+                # https://github.com/requests/requests/issues/3975
+                with requests.get(private_url) as r:
+                    if r.status_code == 200:
+                        print '---> requests.get(private_url) ---> Succeeded'
 
-            r.close()
+                        fp = open(save_fn, 'wb')
+                        fp.write(r.content)
+                        fp.close()
+                    else:
+                        print '---> requests.get(private_url) ---> Failed'
+
+                    r.close()
+            except Exception as _e:
+                print '---> requests.get(private_url) ---> Failed with Exception: ' + str(_e)
+                print '---> will try again (Try #%d)' % (i + 1)
 
         if cnt % 10 == 0:
             print "\n===> %d files processed\n" % cnt
