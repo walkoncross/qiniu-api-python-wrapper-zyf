@@ -13,8 +13,14 @@ if __name__ == '__main__':
     # configs
     aksk_config = './ak_sk.json'
     bucket = 'face-data'
+
+    # You can list all the files/folders in local_paths
+    # All contents under folder will be expanded and uploaded.
     local_paths = [
-        './test.txt'
+        './local_file_1.txt',
+        './local_file_2.txt',
+        './local_folder_1',
+        './local_folder_2'
     ]
 
     prefix = ''
