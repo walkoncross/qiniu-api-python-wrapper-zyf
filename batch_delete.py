@@ -6,7 +6,7 @@ Created on Fri Jul 07 19:01:49 2017
 @author: zhaoy
 """
 
-from advanced_operations import advanced_delete_all
+from qiniu_api_wrapper import advanced_delete_all
 
 
 if __name__ == '__main__':

@@ -6,10 +6,10 @@ Created on Fri Jul 07 19:01:49 2017
 @author: zhaoy
 """
 
-from advanced_operations import advanced_list_all
+from qiniu_api_wrapper import advanced_list_all
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     ##################################################
     # configs
     aksk_config = './ak_sk.json'
@@ -30,8 +30,8 @@ if __name__=='__main__':
     ##################################################
 
     advanced_list_all(aksk_config,
-                        bucket, prefix,
-                        max_list_cnt,
-                        contain_str_list, contain_str_list2,
-                        save_dir,
-                        save_details)
+                      bucket, prefix,
+                      max_list_cnt,
+                      contain_str_list, contain_str_list2,
+                      save_dir,
+                      save_details)

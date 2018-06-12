@@ -5,7 +5,7 @@ Created on Tue Aug 08 06:15:35 2017
 
 @author: zhaoy
 """
-from advanced_operations import advanced_download_keylist
+from qiniu_api_wrapper import advanced_download_keylist
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ Created on Mon Feb 05 06:08:07 2018
 
 @author: zhaoy
 """
-from advanced_operations import advanced_upload_paths
+from qiniu_api_wrapper import advanced_upload_paths
 
 
 if __name__ == '__main__':

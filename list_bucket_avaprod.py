@@ -6,7 +6,7 @@ Created on Fri Jul 07 19:01:49 2017
 @author: zhaoy
 """
 
-from advanced_operations import advanced_list_all
+from qiniu_api_wrapper import advanced_list_all
 
 
 if __name__ == '__main__':
@@ -14,15 +14,20 @@ if __name__ == '__main__':
     # configs
     aksk_config = './ak_sk_avaprod.json'
     save_details = False
+    save_dir = './'
 
-    bucket = 'ava-test'
+    bucket = 'tianyan'
     # prefix = 'lfw'
-    prefix = None
+    prefix = 'fragments/z1.tianyan.tianyan001/15229'
+#    prefix = None
     max_list_cnt = None  # set to None for no limit
-    # contain_str_list = None
-    contain_str_list = ['.zip', '.tgz', '.tar.gz', '.txt']
+#    contain_str_list = None
+    contain_str_list = ['.ts']
+
+#    contain_str_list = ['.zip', '.tgz', '.tar.gz', '.txt']
     # contain_str_list2 = ['']
-    contain_str_list2 = ['lfw']
+#    contain_str_list2 = ['lfw']
+    contain_str_list2 = []
     ##################################################
 
     advanced_list_all(aksk_config,

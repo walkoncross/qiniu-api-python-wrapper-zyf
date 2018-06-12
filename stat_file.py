@@ -12,7 +12,7 @@ from qiniu import Auth
 
 from qiniu import BucketManager
 
-from ak_sk import get_ak_sk
+from qiniu_api_wrapper import get_ak_sk
 
 
 access_key, secret_key = get_ak_sk()

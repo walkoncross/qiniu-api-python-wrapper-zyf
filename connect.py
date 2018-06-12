@@ -7,7 +7,7 @@ Created on Fri Jul 07 18:24:09 2017
 """
 
 from qiniu import Auth
-from ak_sk import get_ak_sk
+from qiniu_api_wrapper import get_ak_sk
 
 access_key, secret_key = get_ak_sk()
 

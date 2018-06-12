@@ -8,7 +8,7 @@ Created on Fri Jul 07 18:25:15 2017
 
 from qiniu import Auth, put_file, etag, urlsafe_base64_encode
 import qiniu.config
-from ak_sk import get_ak_sk
+from qiniu_api_wrapper import get_ak_sk
 
 #需要填写你的 Access Key 和 Secret Key
 # access_key = ''
