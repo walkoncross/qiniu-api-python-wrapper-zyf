@@ -597,18 +597,21 @@ def advanced_download_all(aksk_config,
                 base_url, download_expire_time)
 
             print '---> private_url: ' + private_url
-            r = requests.get(private_url)
+            # r = requests.get(private_url)
 
-            if r.status_code == 200:
-                print '---> requests.get(private_url) ---> Succeeded'
+            # fix a bug according:
+            # https://github.com/requests/requests/issues/3975
+            with requests.get(private_url) as r:
+                if r.status_code == 200:
+                    print '---> requests.get(private_url) ---> Succeeded'
 
-                fp = open(save_fn, 'wb')
-                fp.write(r.content)
-                fp.close()
-            else:
-                print '---> requests.get(private_url) ---> Failed'
+                    fp = open(save_fn, 'wb')
+                    fp.write(r.content)
+                    fp.close()
+                else:
+                    print '---> requests.get(private_url) ---> Failed'
 
-            r.close()
+                r.close()
 
         if 'marker' in ret:
             # print '---> bucket.list() returned info is: ', ret
@@ -705,18 +708,20 @@ def advanced_download_keylist(key_list,
             base_url, download_expire_time)
 
         print '---> private_url: ' + private_url
-        r = requests.get(private_url)
+        # r = requests.get(private_url)
+        # fix a bug according:
+        # https://github.com/requests/requests/issues/3975
+        with requests.get(private_url) as r:
+            if r.status_code == 200:
+                print '---> requests.get(private_url) ---> Succeeded'
 
-        if r.status_code == 200:
-            print '---> requests.get(private_url) ---> Succeeded'
+                fp = open(save_fn, 'wb')
+                fp.write(r.content)
+                fp.close()
+            else:
+                print '---> requests.get(private_url) ---> Failed'
 
-            fp = open(save_fn, 'wb')
-            fp.write(r.content)
-            fp.close()
-        else:
-            print '---> requests.get(private_url) ---> Failed'
-
-        r.close()
+            r.close()
 
         if cnt % 10 == 0:
             print "\n===> %d files processed\n" % cnt
