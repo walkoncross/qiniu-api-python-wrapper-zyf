@@ -313,6 +313,126 @@ def advanced_move_all(aksk_config,
     print '===> Failed to move %d files' % fail_cnt
 
 
+def advanced_copy_all(aksk_config,
+                      bucket, prefix,
+                      bucket2, new_key_func=None,
+                      max_list_cnt=None,
+                      contain_str_list=None,
+                      contain_str_list2=None,
+                      access_key=None, secret_key=None):
+    '''
+    ##################################################
+    # configs
+    # save_details = False
+    #
+    # bucket = 'face-webface2'
+    # prefix = 'lfw'
+    # prefix = 'CASIA-aligned/'
+    # max_list_cnt = None
+    #
+    # contain_str_list = None
+    # contain_str_list = ['.bin']
+    # contain_str_list = ['.zip', '.tgz', '.tar.gz', '.whl', 'sh']
+    # contain_str_list = ['log_1007_2.txt', 'extract-log']
+    # contain_str_list2 = None
+    # contain_str_list2 = ['.bin']
+    # contain_str_list2 = ['lfw']
+    ##################################################
+    '''
+    suc_cnt = 0
+    fail_cnt = 0
+
+    if max_list_cnt is not None and max_list_cnt < 0:
+        max_list_cnt = None
+
+    if new_key_func is None:
+        get_new_key = default_new_key_func
+    else:
+        get_new_key = new_key_func
+
+    bkt_mgr = get_bucket_manager(aksk_config, access_key, secret_key)
+
+    marker = None
+    while True:
+        # 获取文件的状态信息
+        print '\n===> Input marker is: ', marker
+        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        # print '---> bucket.list() returned Ret: ', ret
+        print '---> bucket.list() returned EOF: ', eof
+        # print '---> bucket.list() returned Info: ', info
+
+        if not ret:
+            print "\n===> No qualified files in the bucket"
+            break
+
+        items = ret['items']
+
+        if contain_str_list:
+            #        key_list = [it['key']
+            #                    for it in items if contain_str_list in it['key'].lower()]
+            #        if save_details:
+            #            key_list_detail = [
+            # it for it in items if contain_str_list in it['key'].lower()]
+            key_list = []
+            for i in range(len(items)):
+                for sub_str in contain_str_list:
+                    if sub_str in items[i]['key'].lower():
+                        key_list.append(items[i]['key'])
+                        break
+        else:
+            key_list = [it['key'] for it in items]
+
+        if contain_str_list2:
+            key_list_2 = []
+            for i in range(len(key_list)):
+                for sub_str in contain_str_list2:
+                    if sub_str in key_list[i].lower():
+                        key_list_2.append(key_list[i])
+                        break
+
+            key_list = key_list_2
+
+        # print key_list
+        fetch_cnt = len(key_list)
+        print "\n===> %d qualified files found" % fetch_cnt
+
+        first_n = min(fetch_cnt, 10)
+        print "---> First %d files:" % first_n
+        for i in range(first_n):
+            print '%d --> %s' % (i + 1, key_list[i])
+
+        # json.dump(key_list, fp, indent=2)
+
+        for key in key_list:
+            key2 = get_new_key(key)
+            ret2 = bkt_mgr.copy(bucket, key, bucket2, key2)
+            print '\n===> Moving {} into {}'.format(
+                osp.join(bucket, key), osp.join(bucket2, key2)
+            )
+            if not ret2 or not ret2[0] or ret:
+                print '---> Succeeded to move'
+                suc_cnt += 1
+            else:
+                print '---> Failed to move'
+                print '---> bucket.move() returned:'
+                print ret2
+                fail_cnt += 1
+
+        if 'marker' in ret:
+            marker = str(ret['marker'])
+            print '\n===> bucket.list() returned marker is: ', marker
+            print '\n===> More files to list\n'
+
+            if max_list_cnt:
+                max_list_cnt = max_list_cnt - fetch_cnt
+        else:
+            print 'No more files, list fininshed'
+            break
+
+    print '===> Succeeded to move %d files' % suc_cnt
+    print '===> Failed to move %d files' % fail_cnt
+
+
 def advanced_delete_all(aksk_config,
                         bucket, prefix,
                         max_list_cnt=None,
