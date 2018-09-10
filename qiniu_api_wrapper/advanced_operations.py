@@ -76,6 +76,9 @@ def advanced_list_all(aksk_config,
     # contain_str_list2 = ['lfw']
     ##################################################
     '''
+    bucket = bucket.strip()
+    prefix = prefix.strip()
+
     if max_list_cnt is not None and max_list_cnt < 0:
         max_list_cnt = None
 
@@ -99,10 +102,10 @@ def advanced_list_all(aksk_config,
     while True:
         # 获取文件的状态信息
         print '\n===> Input marker is: ', marker
-        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        ret, eof, resp_info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
         # print '---> bucket.list() returned Ret: ', ret
         print '---> bucket.list() returned EOF: ', eof
-        print '---> bucket.list() returned Info: ', info
+        print '---> bucket.list() returned resp_info: ', resp_info
 
         if not ret:
             print "\n===> No qualified files in the bucket"
@@ -222,6 +225,10 @@ def advanced_move_all(aksk_config,
     suc_cnt = 0
     fail_cnt = 0
 
+    bucket = bucket.strip()
+    bucket2 = bucket2.strip()
+    prefix = prefix.strip()
+
     if max_list_cnt is not None and max_list_cnt < 0:
         max_list_cnt = None
 
@@ -236,14 +243,23 @@ def advanced_move_all(aksk_config,
     while True:
         # 获取文件的状态信息
         print '\n===> Input marker is: ', marker
-        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        ret, eof, resp_info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
         # print '---> bucket.list() returned Ret: ', ret
         print '---> bucket.list() returned EOF: ', eof
-        # print '---> bucket.list() returned Info: ', info
+        # print '---> bucket.list() returned resp_info: ', resp_info
 
-        if not ret:
-            print "\n===> No qualified files in the bucket"
-            break
+        if resp_info.ok():
+            print '---> Succeeded to list'
+            if not ret:
+                print "\n===> No qualified files in the bucket"
+                break
+        else:
+            print '---> Failed to list'
+            print '---> bucket.list() returned Ret: ', ret
+            print '---> bucket.list() returned EOF: ', eof
+            print '---> bucket.list() returned resp_info: ', resp_info
+
+            break            
 
         items = ret['items']
 
@@ -285,18 +301,21 @@ def advanced_move_all(aksk_config,
 
         for key in key_list:
             key2 = get_new_key(key)
-            ret2 = bkt_mgr.move(bucket, key, bucket2, key2)
+            ret2, resp_info2 = bkt_mgr.move(bucket, key, bucket2, key2)
             print '\n===> Moving {} into {}'.format(
                 osp.join(bucket, key), osp.join(bucket2, key2)
             )
-            if not ret2 or not ret2[0] or ret:
-                print '---> Succeeded to move'
+            print '---> bucket.move() returned response: ', ret2
+            
+            if not ret2 and resp_info2.ok():
                 suc_cnt += 1
+                print '---> Succeeded to move %d files' % suc_cnt
             else:
-                print '---> Failed to move'
+                fail_cnt += 1
+                print '---> Failed to move %d files' % fail_cnt
                 print '---> bucket.move() returned:'
                 print ret2
-                fail_cnt += 1
+                print resp_info2
 
         if 'marker' in ret:
             marker = str(ret['marker'])
@@ -342,6 +361,10 @@ def advanced_copy_all(aksk_config,
     suc_cnt = 0
     fail_cnt = 0
 
+    bucket = bucket.strip()
+    bucket2 = bucket2.strip()
+    prefix = prefix.strip()
+
     if max_list_cnt is not None and max_list_cnt < 0:
         max_list_cnt = None
 
@@ -356,14 +379,23 @@ def advanced_copy_all(aksk_config,
     while True:
         # 获取文件的状态信息
         print '\n===> Input marker is: ', marker
-        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        ret, eof, resp_info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
         # print '---> bucket.list() returned Ret: ', ret
         print '---> bucket.list() returned EOF: ', eof
-        # print '---> bucket.list() returned Info: ', info
+        # print '---> bucket.list() returned resp_info: ', resp_info
 
-        if not ret:
-            print "\n===> No qualified files in the bucket"
-            break
+        if resp_info.ok():
+            print '---> Succeeded to list'
+            if not ret:
+                print "\n===> No qualified files in the bucket"
+                break
+        else:
+            print '---> Failed to list'
+            print '---> bucket.list() returned Ret: ', ret
+            print '---> bucket.list() returned EOF: ', eof
+            print '---> bucket.list() returned resp_info: ', resp_info
+
+            break            
 
         items = ret['items']
 
@@ -405,18 +437,22 @@ def advanced_copy_all(aksk_config,
 
         for key in key_list:
             key2 = get_new_key(key)
-            ret2 = bkt_mgr.copy(bucket, key, bucket2, key2)
-            print '\n===> Moving {} into {}'.format(
+            ret2, resp_info2 = bkt_mgr.copy(bucket, key, bucket2, key2)
+            print '\n===> Copying {} into {}'.format(
                 osp.join(bucket, key), osp.join(bucket2, key2)
             )
-            if not ret2 or not ret2[0] or ret:
-                print '---> Succeeded to move'
+            # print '---> bucket.copy() returned response: ', ret2, resp_info2
+
+            if not ret2 and resp_info2.ok():
                 suc_cnt += 1
+                print '---> Succeeded to copy %d files' % suc_cnt
             else:
-                print '---> Failed to move'
+                fail_cnt += 1
+                print '---> Failed to copy %d files' % fail_cnt
                 print '---> bucket.move() returned:'
                 print ret2
-                fail_cnt += 1
+                print resp_info2
+
 
         if 'marker' in ret:
             marker = str(ret['marker'])
@@ -440,7 +476,11 @@ def advanced_delete_all(aksk_config,
                         contain_str_list2=None,
                         access_key=None, secret_key=None):
 
-    cnt = 0
+    suc_cnt = 0
+    fail_cnt = 0
+
+    bucket = bucket.strip()
+    prefix = prefix.strip()
 
     if max_list_cnt is not None and max_list_cnt < 0:
         max_list_cnt = None
@@ -451,14 +491,23 @@ def advanced_delete_all(aksk_config,
     while True:
         # 获取文件的状态信息
         print '\n===> Input marker is: ', marker
-        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        ret, eof, resp_info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
         # print '---> bucket.list() returned Ret: ', ret
         print '---> bucket.list() returned EOF: ', eof
-        # print '---> bucket.list() returned Info: ', info
+        # print '---> bucket.list() returned resp_info: ', resp_info
 
-        if not ret:
-            print "===> No qualified files in the bucket"
-            break
+        if resp_info.ok():
+            print '---> Succeeded to list'
+            if not ret:
+                print "\n===> No qualified files in the bucket"
+                break
+        else:
+            print '---> Failed to list'
+            print '---> bucket.list() returned Ret: ', ret
+            print '---> bucket.list() returned EOF: ', eof
+            print '---> bucket.list() returned resp_info: ', resp_info
+
+            break  
 
         items = ret['items']
 
@@ -500,10 +549,18 @@ def advanced_delete_all(aksk_config,
 
         for it in key_list:
             print '---> delete ', it
-            bkt_mgr.delete(bucket, it)
-            cnt += 1
-            print '\n===> %d files deleted\n' % cnt
-
+            ret2, resp_info2 = bkt_mgr.delete(bucket, it)
+            
+            if not ret2 and resp_info2.ok():
+                suc_cnt += 1
+                print '---> Succeeded to delete %d files' % suc_cnt
+            else:
+                fail_cnt += 1
+                print '---> Failed to delete %d files' % fail_cnt
+                print '---> bucket.delete() returned:'
+                print ret2
+                print resp_info2
+            
         if 'marker' in ret:
             marker = str(ret['marker'])
             print '\n===> returned marker is: ', marker
@@ -517,16 +574,19 @@ def advanced_delete_all(aksk_config,
 
 
 def upload_file(localfile, auth, bucket, key, upload_expire_time):
+    bucket = bucket.strip()
+    key = key.strip()
+
     token = auth.upload_token(bucket, key, upload_expire_time)
 
-    ret, info = put_file(token, key, localfile)
-    print '---> bucket.list() returned Info: ', info
+    ret, resp_info = put_file(token, key, localfile)
+    print '---> bucket.list() returned resp_info: ', resp_info
 
-    if ret['key'] == key and ret['hash'] == etag(localfile):
+    if resp_info.ok() and ret['key'] == key and ret['hash'] == etag(localfile):
         return True
     else:
         print '\n===> Failed to upload ', localfile
-        print '\n===> Failed info: {}'.format(info)
+        print '\n===> Failed resp_info: {}'.format(resp_info)
         return False
 
 
@@ -546,6 +606,8 @@ def advanced_upload_paths(aksk_config,
                           prefix=None,
                           upload_expire_time=-1,
                           access_key=None, secret_key=None):
+    bucket = bucket.strip()
+    prefix = prefix.strip()
 
     if upload_expire_time <= 0:
         upload_expire_time = 3600
@@ -619,6 +681,9 @@ def advanced_download_all(aksk_config,
     # contain_str_list = 'txt'
     ##################################################
     '''
+    bucket = bucket.strip()
+    bucket_domain = bucket_domain.strip()
+    prefix = prefix.strip()
 
     if max_list_cnt is not None and max_list_cnt < 0:
         max_list_cnt = None
@@ -641,14 +706,24 @@ def advanced_download_all(aksk_config,
     while True:
         # 获取文件的状态信息
         print '\n===> Input marker is: ', marker
-        ret, eof, info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
+        ret, eof, resp_info = bkt_mgr.list(bucket, prefix, marker, max_list_cnt)
         # print '---> bucket.list() returned Ret: ', ret
         print '---> bucket.list() returned EOF: ', eof
-        # print '---> bucket.list() returned Info: ', info
+        # print '---> bucket.list() returned resp_info: ', resp_info
 
-        if not ret:
-            print "\n===> No qualified files in the bucket"
-            break
+
+        if resp_info.ok():
+            print '---> Succeeded to list'
+            if not ret:
+                print "\n===> No qualified files in the bucket"
+                break
+        else:
+            print '---> Failed to list'
+            print '---> bucket.list() returned Ret: ', ret
+            print '---> bucket.list() returned EOF: ', eof
+            print '---> bucket.list() returned resp_info: ', resp_info
+
+            break     
 
         items = ret['items']
 
@@ -743,7 +818,7 @@ def advanced_download_all(aksk_config,
                     print '---> will try again (Try #%d)' % (i + 1)
 
         if 'marker' in ret:
-            # print '---> bucket.list() returned info is: ', ret
+            # print '---> bucket.list() returned resp_info is: ', ret
             marker = str(ret['marker'])
             print '\n===> bucket.list() returned marker is: ', marker
             print '\n===> More files to list\n'
@@ -773,6 +848,8 @@ def advanced_download_keylist(key_list,
     bucket_domain = 'http://outj1l7fd.bkt.clouddn.com'
     ##################################################
     '''
+    bucket_domain = bucket_domain.strip()
+    
     if not download_save_path:
         download_save_path = r'./bkt_download_files'
 
